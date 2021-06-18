@@ -1,6 +1,7 @@
 import Search from './model/Search';
 import {elements,renderLoader,clearLoader} from './view/base';
 import * as SearchView from './view/SearchView';
+import Recipe from './model/Recipe';
 // 
 // let search = new Search("pasta");
 // search.doSearch().then(res => console.log(res));
@@ -8,7 +9,10 @@ import * as SearchView from './view/SearchView';
 // web app tuluv
 // hamgiin amarhan 
 const state = {};
-
+/* MVC 
+    controller indexjs 
+    MODEL ===> ? CONTROLLER ? << VIEW
+*/
 const controlSearch = async ()=>{
   const query= SearchView.getInput();
   if(query){
@@ -37,3 +41,17 @@ elements.pageButton.addEventListener("click", e=>{
     SearchView.renderRecipes(state.search.result,num);
   }
 });
+
+// const r = new Recipe(47746);
+// r.getRecipe();
+ const controlRecipe = async ()=>{
+  const id = window.location.hash.replace('#','');
+  state.recipe = new Recipe(id);
+
+  await state.recipe.getRecipe();
+  state.recipe.calcTime();
+  state.recipe.calcPorts();
+  console.log(state.recipe);
+
+};
+window.addEventListener("hashchange",controlRecipe)
