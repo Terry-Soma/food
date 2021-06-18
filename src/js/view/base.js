@@ -3,6 +3,7 @@ export const elements = {
     searchInput: document.querySelector(".search__field"),
     searchResultList: document.querySelector(".results__list"),
     searchResultDiv: document.querySelector(".results"),
+    pageButton: document.querySelector(".results__pages")
 };
 
 export const renderLoader = parent=> {

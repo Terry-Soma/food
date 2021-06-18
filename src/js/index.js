@@ -28,3 +28,12 @@ elements.searchform.addEventListener("submit",e=>{
   e.preventDefault();
   controlSearch();
 });
+elements.pageButton.addEventListener("click", e=>{
+  const btn = e.target.closest(".btn-inline");
+  if(btn){
+    const num = parseInt(btn.dataset.goto,10);  
+    /* li -g tseverleh  buttong */
+    SearchView.ClearResultList();
+    SearchView.renderRecipes(state.search.result,num);
+  }
+});
