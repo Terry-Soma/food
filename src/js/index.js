@@ -1,5 +1,5 @@
 import Search from './model/Search';
-import {elements} from './view/base';
+import {elements,renderLoader,clearLoader} from './view/base';
 import * as SearchView from './view/SearchView';
 // 
 // let search = new Search("pasta");
@@ -15,9 +15,10 @@ const controlSearch = async ()=>{
     state.search = new Search(query);
     /* input iig clean hiih */SearchView.Clearsearch();
     /* li -g tseverleh */SearchView.ClearResultList();
+    renderLoader(elements.searchResultDiv);
     await state.search.doSearch();
 
-
+    clearLoader();
     if(state.search.result ===undefined) alert("Жор олдсонгүй ....");
     else SearchView.renderRecipes(state.search.result);
   }
