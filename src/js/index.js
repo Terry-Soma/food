@@ -1,4 +1,6 @@
 import Search from './model/Search';
+import {elements} from './view/base';
+import * as SearchView from './view/SearchView';
 // 
 // let search = new Search("pasta");
 // search.doSearch().then(res => console.log(res));
@@ -8,15 +10,20 @@ import Search from './model/Search';
 const state = {};
 
 const controlSearch = async ()=>{
-  const query="pizza";
+  const query= SearchView.getInput();
   if(query){
     state.search = new Search(query);
+    /* input iig clean hiih */SearchView.Clearsearch();
+    /* li -g tseverleh */SearchView.ClearResultList();
     await state.search.doSearch();
-    console.log(state.search.result);
-  } 
+
+
+    if(state.search.result ===undefined) alert("Жор олдсонгүй ....");
+    else SearchView.renderRecipes(state.search.result);
+  }
 
 }
-document.querySelector(".search").addEventListener("submit",e=>{
+elements.searchform.addEventListener("submit",e=>{
   e.preventDefault();
   controlSearch();
 });
