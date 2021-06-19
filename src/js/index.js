@@ -2,6 +2,9 @@ import Search from './model/Search';
 import {elements,renderLoader,clearLoader} from './view/base';
 import * as SearchView from './view/SearchView';
 import Recipe from './model/Recipe';
+import {renderRecipe, clearRecipe, highlight} from './view/RecipeView';
+import List from './model/List';
+import * as listView from './view/listView';
 // 
 // let search = new Search("pasta");
 // search.doSearch().then(res => console.log(res));
@@ -46,12 +49,50 @@ elements.pageButton.addEventListener("click", e=>{
 // r.getRecipe();
  const controlRecipe = async ()=>{
   const id = window.location.hash.replace('#','');
-  state.recipe = new Recipe(id);
+  if(id){
+    state.recipe = new Recipe(id);
+    clearRecipe();/* ui tseverleh */
+    renderLoader(elements.recipeDiv);
+    highlight(id);
+    await state.recipe.getRecipe();
+    clearLoader();
+    state.recipe.calcTime();
+    state.recipe.calcPorts();
+    renderRecipe(state.recipe);
+  }
+  
 
-  await state.recipe.getRecipe();
-  state.recipe.calcTime();
-  state.recipe.calcPorts();
-  console.log(state.recipe);
 
 };
-window.addEventListener("hashchange",controlRecipe)
+window.addEventListener("hashchange",controlRecipe);
+window.addEventListener("load",controlRecipe);
+// ["hashchange","load"].forEach(el=> window.addEventListener(e,controlRecipe));
+const controlList = ()=>{
+  state.list = new List();
+  listView.clearList();
+  state.recipe.ingredients.forEach(e => {
+    const item = state.list.addItem(e);
+    listView.renderItem(item);
+  
+  });
+
+};
+
+
+
+
+elements.recipeDiv.addEventListener("click",e=>{
+    if(e.target.matches(".recipe__btn, .recipe__btn *")){
+      controlList();
+    }
+});
+
+elements.shopList.addEventListener("click",e=>{
+    const id = e.target.closest(".shopping__item").dataset.itemid;
+
+    if(id) {
+      state.list.deleteItem(id);
+      listView.deleteList(id);    }
+
+    
+});
