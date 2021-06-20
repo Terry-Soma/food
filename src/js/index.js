@@ -4,14 +4,13 @@ import * as SearchView from './view/SearchView';
 import Recipe from './model/Recipe';
 import {renderRecipe, clearRecipe, highlight} from './view/RecipeView';
 import List from './model/List';
+import Like from './model/Like';
 import * as listView from './view/listView';
-// 
-// let search = new Search("pasta");
-// search.doSearch().then(res => console.log(res));
-// 
-// web app tuluv
-// hamgiin amarhan 
+import * as likesView from './view/likesView';
+
 const state = {};
+
+
 /* MVC 
     controller indexjs 
     MODEL ===> ? CONTROLLER ? << VIEW
@@ -49,6 +48,7 @@ elements.pageButton.addEventListener("click", e=>{
 // r.getRecipe();
  const controlRecipe = async ()=>{
   const id = window.location.hash.replace('#','');
+  
   if(id){
     state.recipe = new Recipe(id);
     clearRecipe();/* ui tseverleh */
@@ -58,14 +58,19 @@ elements.pageButton.addEventListener("click", e=>{
     clearLoader();
     state.recipe.calcTime();
     state.recipe.calcPorts();
-    renderRecipe(state.recipe);
+    renderRecipe(state.recipe,state.like.isLiked(id));
   }
-  
-
-
 };
 window.addEventListener("hashchange",controlRecipe);
 window.addEventListener("load",controlRecipe);
+window.addEventListener("load",e=>{
+  if(!state.like) state.like = new Like();
+
+  likesView.toggleLikeMenu(state.like.getNumberOfLikes());
+  state.like.likes.forEach(like=> likesView.renderLike(like));
+
+
+});
 // ["hashchange","load"].forEach(el=> window.addEventListener(e,controlRecipe));
 const controlList = ()=>{
   state.list = new List();
@@ -77,6 +82,30 @@ const controlList = ()=>{
   });
 
 };
+const controlLike = ()=>{
+  
+  /* bug */
+  if(!state.like) state.like = new Like();
+  const currentRecipeId = state.recipe.id;
+  if(state.like.isLiked(currentRecipeId)){
+    /* rem   like */
+    
+    state.like.deleteLike(currentRecipeId);
+    console.log(state.like);
+    likesView.deleteLike(currentRecipeId)
+    likesView.toggleLikeBtn(false);
+
+  }else{
+    const newLike = state.like.addLike(currentRecipeId,state.recipe.title,state.recipe.publisher,state.recipe.image_url);
+    console.log(state.like);
+    likesView.toggleLikeBtn(true);
+    
+/* add  */
+likesView.renderLike(newLike);
+  }
+  likesView.toggleLikeMenu(state.like.getNumberOfLikes());
+
+};
 
 
 
@@ -84,6 +113,8 @@ const controlList = ()=>{
 elements.recipeDiv.addEventListener("click",e=>{
     if(e.target.matches(".recipe__btn, .recipe__btn *")){
       controlList();
+    }else if(e.target.matches(".recipe__love, .recipe__love *")){
+      controlLike();
     }
 });
 
@@ -93,6 +124,4 @@ elements.shopList.addEventListener("click",e=>{
     if(id) {
       state.list.deleteItem(id);
       listView.deleteList(id);    }
-
-    
-});
+    });
